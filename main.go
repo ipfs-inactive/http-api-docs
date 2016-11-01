@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"sort"
 
 	cmds "github.com/ipfs/go-ipfs/commands"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
@@ -103,8 +104,16 @@ func GenerateDocs(api []*Endpoint, formatter Formatter) string {
 	return buf.String()
 }
 
+type byName []*Endpoint
+
+func (a byName) Len() int           { return len(a) }
+func (a byName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
 func main() {
 	api := extractSubcommands(APIPrefix, corecmds.Root)
+	sort.Sort(byName(api))
+
 	formatter := new(MarkdownFormatter)
 	fmt.Println(GenerateDocs(api, formatter))
 }

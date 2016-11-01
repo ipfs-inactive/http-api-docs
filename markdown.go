@@ -56,9 +56,7 @@ func (md *MarkdownFormatter) GenerateArgumentsBlock(args []*Argument, opts []*Ar
 	}
 
 	for _, arg := range args {
-		if arg.Type != "file" {
-			fmt.Fprintf(buf, genArgument(arg, true))
-		}
+		fmt.Fprintf(buf, genArgument(arg, true))
 	}
 	for _, opt := range opts {
 		fmt.Fprintf(buf, genArgument(opt, false))
@@ -102,9 +100,9 @@ func (md *MarkdownFormatter) GenerateBodyBlock(args []*Argument) string {
 		fmt.Fprintf(buf, `
 ### Request Body
 
-This endpoint expects a file in the body of the request as 'multipart/form-data'
+Argument "%s" is of file type. This endpoint expects a file in the body of the request as 'multipart/form-data'.
 
-`)
+`, bodyArg.Name)
 		return buf.String()
 	}
 	return ""
