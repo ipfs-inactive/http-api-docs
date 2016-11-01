@@ -72,7 +72,8 @@ func extractSubcommands(name string, cmd *cmds.Command) (endpoints []*Endpoint) 
 		})
 	}
 
-	if ignore := IgnoreEndpoints[name]; !ignore {
+	ignore := len(cmd.Subcommands) > 0 || IgnoreEndpoints[name]
+	if !ignore {
 		endpoints = []*Endpoint{
 			&Endpoint{
 				Name:        name,
