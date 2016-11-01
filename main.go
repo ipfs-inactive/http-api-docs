@@ -3,14 +3,18 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"regexp"
-	"strings"
 
 	cmds "github.com/ipfs/go-ipfs/commands"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
 )
 
 const APIPrefix = "/api/v0"
+
+var IgnoreEndpoints = map[string]bool{
+	"/api/v0":        true,
+	"/api/v0/files":  true,
+	"/api/v0/pubsub": true,
+}
 
 type Endpoint struct {
 	Name        string
@@ -26,6 +30,16 @@ type Argument struct {
 	Type        string
 	Required    bool
 	Default     string
+}
+
+type Formatter interface {
+	GenerateIntro() string
+	GenerateIndex(endp []*Endpoint) string
+	GenerateEndpointBlock(endp *Endpoint) string
+	GenerateArgumentsBlock(args []*Argument, opts []*Argument) string
+	GenerateBodyBlock(args []*Argument) string
+	GenerateResponseBlock(response string) string
+	GenerateExampleBlock(endp *Endpoint) string
 }
 
 func extractSubcommands(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
@@ -57,13 +71,15 @@ func extractSubcommands(name string, cmd *cmds.Command) (endpoints []*Endpoint) 
 		})
 	}
 
-	endpoints = []*Endpoint{
-		&Endpoint{
-			Name:        name,
-			Description: cmd.Helptext.Tagline,
-			Arguments:   arguments,
-			Options:     options,
-		},
+	if ignore := IgnoreEndpoints[name]; !ignore {
+		endpoints = []*Endpoint{
+			&Endpoint{
+				Name:        name,
+				Description: cmd.Helptext.Tagline,
+				Arguments:   arguments,
+				Options:     options,
+			},
+		}
 	}
 
 	for n, cmd := range cmd.Subcommands {
@@ -73,163 +89,22 @@ func extractSubcommands(name string, cmd *cmds.Command) (endpoints []*Endpoint) 
 	return endpoints
 }
 
-func genAPIDocIndex(api []*Endpoint) string {
+func GenerateDocs(api []*Endpoint, formatter Formatter) string {
 	buf := new(bytes.Buffer)
-	fmt.Fprintf(buf, "## Index\n\n")
-
+	buf.WriteString(formatter.GenerateIntro())
+	buf.WriteString(formatter.GenerateIndex(api))
 	for _, endp := range api {
-		fmt.Fprintf(buf, "  *  [%s](#%s)\n", endp.Name, endp.Name)
+		buf.WriteString(formatter.GenerateEndpointBlock(endp))
+		buf.WriteString(formatter.GenerateArgumentsBlock(endp.Arguments, endp.Options))
+		buf.WriteString(formatter.GenerateBodyBlock(endp.Arguments))
+		buf.WriteString(formatter.GenerateResponseBlock(endp.Response))
+		buf.WriteString(formatter.GenerateExampleBlock(endp))
 	}
-
-	fmt.Fprintln(buf)
-	fmt.Fprintln(buf)
-	return buf.String()
-}
-
-func genAPIDocArgument(arg *Argument, aliasToArg bool) string {
-	buf := new(bytes.Buffer)
-	alias := arg.Name
-	if aliasToArg {
-		alias = "arg"
-	}
-	fixDesc, _ := regexp.Compile(" Default: [a-zA-z0-9-_]+ ?\\.")
-	fmt.Fprintf(buf, "  - %s [%s]: %s", alias, arg.Type, fixDesc.ReplaceAll([]byte(arg.Description), []byte("")))
-	if len(arg.Default) > 0 {
-		fmt.Fprintf(buf, ` Default: "%s".`, arg.Default)
-	}
-	if arg.Required {
-		fmt.Fprintf(buf, ` Required: **yes**.`)
-	} else {
-		fmt.Fprintf(buf, ` Required: no.`)
-	}
-	fmt.Fprintln(buf)
-	return buf.String()
-}
-
-func genAPIDocBody(arg *Argument) string {
-	buf := new(bytes.Buffer)
-	fmt.Fprintf(buf, "### Request Body\n\n")
-	fmt.Fprintf(buf, "This endpoint expects a file in the body of the request as 'multipart/form-data'.\n")
-	return buf.String()
-}
-
-func genAPIDocResponse(resp string) string {
-	buf := new(bytes.Buffer)
-	fmt.Fprintf(buf, "### Response\n\n")
-	fmt.Fprintf(buf, "TODO.\n")
-	return buf.String()
-}
-
-func genAPIDocExample(endp *Endpoint) string {
-	buf := new(bytes.Buffer)
-	fmt.Fprintf(buf, "### curl example\n\n")
-	fmt.Fprintf(buf, "`")
-	fmt.Fprintf(buf, "curl ")
-
-	// Assemble arguments which are not of type file
-	var queryargs []string
-	hasFileArg := false
-	for _, arg := range endp.Arguments {
-		q := "arg="
-		if arg.Type != "file" {
-			q += "<" + arg.Name + ">"
-			queryargs = append(queryargs, q)
-		} else {
-			hasFileArg = true
-		}
-	}
-
-	// Assemble options
-	for _, opt := range endp.Options {
-		q := opt.Name + "="
-		//if !opt.Required { // Omit non required options
-		//	continue
-		//}
-		if len(opt.Default) > 0 {
-			q += opt.Default
-		} else {
-			q += "<value>"
-		}
-		queryargs = append(queryargs, q)
-	}
-
-	if hasFileArg {
-		fmt.Fprintf(buf, "-F file=@myfile ")
-	}
-
-	fmt.Fprintf(buf, "\"http://localhost:5001%s", endp.Name)
-	if len(queryargs) > 0 {
-		fmt.Fprintf(buf, "?%s\"", strings.Join(queryargs, "&"))
-	} else {
-		fmt.Fprintf(buf, "\"")
-	}
-
-	fmt.Fprintf(buf, "`\n\n")
-	return buf.String()
-}
-
-func genAPIDocEndpoint(endp *Endpoint) string {
-	buf := new(bytes.Buffer)
-
-	fmt.Fprintf(buf, "\n## %s\n\n", endp.Name)
-	fmt.Fprintf(buf, "%s\n\n", endp.Description)
-
-	fmt.Fprintf(buf, "### Arguments\n\n")
-	if len(endp.Arguments)+len(endp.Options) == 0 {
-		fmt.Fprintf(buf, "This endpoint takes no arguments.")
-	}
-	var bodyArg *Argument
-
-	for _, arg := range endp.Arguments {
-		if arg.Type == "file" {
-			bodyArg = arg
-		} else {
-			fmt.Fprintf(buf, genAPIDocArgument(arg, true))
-		}
-	}
-	for _, opt := range endp.Options {
-		fmt.Fprintf(buf, genAPIDocArgument(opt, false))
-	}
-
-	fmt.Fprintf(buf, "\n")
-
-	if bodyArg != nil {
-		fmt.Fprintf(buf, genAPIDocBody(bodyArg))
-	}
-
-	fmt.Fprintf(buf, "\n\n")
-	fmt.Fprintf(buf, genAPIDocResponse(endp.Response))
-	fmt.Fprintf(buf, "\n\n")
-	fmt.Fprintf(buf, genAPIDocExample(endp))
-	fmt.Fprintf(buf, "\n\n")
-	return buf.String()
-}
-
-func genAPIDocs(api []*Endpoint) string {
-	buf := new(bytes.Buffer)
-
-	fmt.Fprintf(buf, "# IPFS HTTP API Specification\n\n")
-	fmt.Fprintf(buf, `
-This document is autogenerated from go-ipfs source code.
-
-`)
-	fmt.Fprintf(buf, genAPIDocIndex(api))
-
-	fmt.Fprintln(buf)
-
-	for _, endp := range api {
-		fmt.Fprintf(buf, genAPIDocEndpoint(endp))
-	}
-
-	fmt.Println(buf)
 	return buf.String()
 }
 
 func main() {
 	api := extractSubcommands(APIPrefix, corecmds.Root)
-	//	for _, endp := range api {
-	//		fmt.Printf("%s\n", endp.Name)
-	//	}
-
-	genAPIDocs(api)
+	formatter := new(MarkdownFormatter)
+	fmt.Println(GenerateDocs(api, formatter))
 }
