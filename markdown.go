@@ -3,7 +3,6 @@ package docs
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -25,7 +24,7 @@ save_as: docs/api/index.html
 
 # API Reference
 
-Generated on %s.
+<sup>Generated on %s, from go-ipfs v%s.</sup>
 
 This is the HTTP API specification for IPFS.
 
@@ -100,7 +99,8 @@ flag is the %s query parameter below:
   "Data": "CAE="
 }
 `+"```\n",
-		time.Now(),
+		time.Now().Format("2006-01-02"),
+		IPFSVersion(),
 		"`--encoding=json`",
 		"`&encoding=json`")
 
@@ -194,20 +194,16 @@ Argument "%s" is of file type. This endpoint expects a file in the body of the r
 	return ""
 }
 
-func (md *MarkdownFormatter) GenerateResponseBlock(response *Response) string {
+func (md *MarkdownFormatter) GenerateResponseBlock(response string) string {
 	buf := new(bytes.Buffer)
 	fmt.Fprintf(buf, `
 #### Response
 
+On success, the call to this endpoint will return with 200 and the following body:
+
 `)
 
-	if response.Text {
-		buf.WriteString("This endpoint returns a not standarized `text/plain` response.\n\n")
-	} else {
-		buf.WriteString("```text\n" + response.Schema + "\n```\n\n")
-	}
-
-	fmt.Fprintf(os.Stderr, response.Schema)
+	buf.WriteString("```text\n" + response + "\n```\n\n")
 
 	return buf.String()
 }

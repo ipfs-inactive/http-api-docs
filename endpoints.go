@@ -11,10 +11,17 @@ import (
 
 	cmds "github.com/ipfs/go-ipfs/commands"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
+	config "github.com/ipfs/go-ipfs/repo/config"
 )
 
 // A map of single endpoints to be skipped (subcommands are processed though).
 var IgnoreEndpoints = map[string]bool{}
+
+// How much to indent when generating the response schemas
+const IndentLevel = 4
+
+// Failsafe when traversing objects containing objects of the same type
+const MaxIndent = 20
 
 // Endpoint defines an IPFS RPC API endpoint.
 type Endpoint struct {
@@ -22,7 +29,7 @@ type Endpoint struct {
 	Arguments   []*Argument
 	Options     []*Argument
 	Description string
-	Response    *Response
+	Response    string
 	Group       string
 }
 
@@ -33,11 +40,6 @@ type Argument struct {
 	Type        string
 	Required    bool
 	Default     string
-}
-
-type Response struct {
-	Text   bool
-	Schema string
 }
 
 type sorter []*Endpoint
@@ -53,43 +55,48 @@ func AllEndpoints() []*Endpoint {
 	return Endpoints(APIPrefix, corecmds.Root)
 }
 
+func IPFSVersion() string {
+	return config.CurrentVersionNumber
+}
+
 // Endpoints receives a name and a go-ipfs command and returns the endpoints it
 // defines] (sorted). It does this by recursively gathering endpoints defined by
 // subcommands. Thus, calling it with the core command Root generates all
 // the endpoints.
 func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 	var arguments []*Argument
-	for _, arg := range cmd.Arguments {
-		argType := "string"
-		if arg.Type == cmds.ArgFile {
-			argType = "file"
-		}
-		arguments = append(arguments, &Argument{
-			Name:        arg.Name,
-			Type:        argType,
-			Required:    arg.Required,
-			Description: arg.Description,
-		})
-	}
-
 	var options []*Argument
-	for _, opt := range cmd.Options {
-		def := fmt.Sprint(opt.DefaultVal())
-		if def == "<nil>" {
-			def = ""
-		}
-		options = append(options, &Argument{
-			Name:        opt.Names()[0],
-			Type:        opt.Type().String(),
-			Description: opt.Description(),
-			Default:     def,
-		})
-	}
-
-	res := buildResponse(cmd.Type)
 
 	ignore := len(cmd.Subcommands) > 0 || IgnoreEndpoints[name]
-	if !ignore {
+	if !ignore { // Extract arguments, options...
+		for _, arg := range cmd.Arguments {
+			argType := "string"
+			if arg.Type == cmds.ArgFile {
+				argType = "file"
+			}
+			arguments = append(arguments, &Argument{
+				Name:        arg.Name,
+				Type:        argType,
+				Required:    arg.Required,
+				Description: arg.Description,
+			})
+		}
+
+		for _, opt := range cmd.Options {
+			def := fmt.Sprint(opt.DefaultVal())
+			if def == "<nil>" {
+				def = ""
+			}
+			options = append(options, &Argument{
+				Name:        opt.Names()[0],
+				Type:        opt.Type().String(),
+				Description: opt.Description(),
+				Default:     def,
+			})
+		}
+
+		res := buildResponse(cmd.Type)
+
 		endpoints = []*Endpoint{
 			&Endpoint{
 				Name:        name,
@@ -109,6 +116,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 	return endpoints
 }
 
+// TODO: This maybe should be a separate Go module for reusability
 func interfaceToJsonish(t reflect.Type, i int) string {
 	// Aux function
 	insertIndent := func(i int) string {
@@ -120,7 +128,7 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 	}
 
 	result := new(bytes.Buffer)
-	if i > 20 { // 5 levels is enough. Infinite loop failsafe
+	if i > MaxIndent { // 5 levels is enough. Infinite loop failsafe
 		return insertIndent(i) + "...\n"
 	}
 
@@ -131,15 +139,15 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 		return interfaceToJsonish(t.Elem(), i)
 	case reflect.Map:
 		result.WriteString(insertIndent(i) + "{\n")
-		result.WriteString(insertIndent(i+4) + fmt.Sprintf(`"<%s>": `, t.Key().Kind()))
-		result.WriteString(interfaceToJsonish(t.Elem(), i+4))
+		result.WriteString(insertIndent(i+IndentLevel) + fmt.Sprintf(`"<%s>": `, t.Key().Kind()))
+		result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
 		result.WriteString(insertIndent(i) + "}\n")
 	case reflect.Struct:
 		result.WriteString(insertIndent(i) + "{\n")
 		for j := 0; j < t.NumField(); j++ {
 			f := t.Field(j)
-			result.WriteString(fmt.Sprintf(insertIndent(i+4)+"\"%s\": ", f.Name))
-			result.WriteString(interfaceToJsonish(f.Type, i+4))
+			result.WriteString(fmt.Sprintf(insertIndent(i+IndentLevel)+"\"%s\": ", f.Name))
+			result.WriteString(interfaceToJsonish(f.Type, i+IndentLevel))
 		}
 		result.WriteString(insertIndent(i) + "}\n")
 	case reflect.Slice:
@@ -148,7 +156,7 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 			result.WriteString("null\n")
 		} else {
 			result.WriteString("[\n")
-			result.WriteString(interfaceToJsonish(t.Elem(), i+4))
+			result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
 			result.WriteString(insertIndent(i) + "]\n")
 		}
 	default:
@@ -156,22 +164,18 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 
 	}
 
+	// This removes wrong indents in cases like "key:      <string>"
 	fix, _ := regexp.Compile(":[ ]+")
 	finalResult := string(fix.ReplaceAll(result.Bytes(), []byte(": ")))
 
 	return string(finalResult)
 }
 
-func buildResponse(res interface{}) *Response {
+func buildResponse(res interface{}) string {
 	// Commands with a nil type return text. This is a bad thing.
 	if res == nil {
-		return &Response{
-			Text: true,
-		}
+		return "This endpoint returns a `text/plain` response body."
 	}
 
-	return &Response{
-		Text:   false,
-		Schema: interfaceToJsonish(reflect.TypeOf(res), 0) + "\n",
-	}
+	return interfaceToJsonish(reflect.TypeOf(res), 0)
 }

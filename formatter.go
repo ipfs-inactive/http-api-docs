@@ -9,7 +9,7 @@ type Formatter interface {
 	GenerateEndpointBlock(endp *Endpoint) string
 	GenerateArgumentsBlock(args []*Argument, opts []*Argument) string
 	GenerateBodyBlock(args []*Argument) string
-	GenerateResponseBlock(response *Response) string
+	GenerateResponseBlock(response string) string
 	GenerateExampleBlock(endp *Endpoint) string
 }
 
