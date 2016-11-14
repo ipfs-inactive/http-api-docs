@@ -1,0 +1,11 @@
+language: go
+go:
+  - '1.7'
+
+install:
+  - go get github.com/ipfs/go-ipfs
+  - cd $GOPATH/src/github.com/ipfs/go-ipfs
+  - make deps
+
+script:
+  - make test
