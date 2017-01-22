@@ -6,6 +6,7 @@ install:
   - go get github.com/ipfs/go-ipfs
   - cd $GOPATH/src/github.com/ipfs/go-ipfs
   - make deps
+  - cd -
 
 script:
   - make test
