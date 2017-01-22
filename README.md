@@ -13,6 +13,7 @@
 
 - [Install](#install)
 - [Usage](#usage)
+- [Captain](#captain)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -47,6 +48,10 @@ After installing you can run:
 ```
 
 This should spit out a Markdown document. This is exactly the api.md documentation at https://github.com/ipfs/website/blob/master/content/pages/docs/api.md , so you can redirect the output to just overwrite that file.
+
+## Captain
+
+This project is captained by @hsanjuan.
 
 ## Contribute
 
