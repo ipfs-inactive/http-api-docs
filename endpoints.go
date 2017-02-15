@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
+	"strings"
 
 	cmds "github.com/ipfs/go-ipfs/commands"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
@@ -127,6 +128,22 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 		return buf.String()
 	}
 
+	countExported := func(t reflect.Type) int {
+		if t.Kind() != reflect.Struct {
+			return 0
+		}
+
+		count := 0
+
+		for i := 0; i < t.NumField(); i++ {
+			f := t.Field(i)
+			if f.Name[0:1] == strings.ToUpper(f.Name[0:1]) {
+				count++
+			}
+		}
+		return count
+	}
+
 	result := new(bytes.Buffer)
 	if i > MaxIndent { // 5 levels is enough. Infinite loop failsafe
 		return insertIndent(i) + "...\n"
@@ -135,7 +152,12 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 	switch t.Kind() {
 	case reflect.Invalid:
 		result.WriteString("null\n")
+	case reflect.Interface:
+		result.WriteString(insertIndent(i) + "\"<object>\"\n")
 	case reflect.Ptr:
+		if _, ok := t.MethodByName("String"); ok && countExported(t.Elem()) == 0 {
+			return interfaceToJsonish(reflect.TypeOf(""), i)
+		}
 		return interfaceToJsonish(t.Elem(), i)
 	case reflect.Map:
 		result.WriteString(insertIndent(i) + "{\n")
@@ -143,6 +165,9 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 		result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
 		result.WriteString(insertIndent(i) + "}\n")
 	case reflect.Struct:
+		if _, ok := t.MethodByName("String"); ok && countExported(t) == 0 {
+			return interfaceToJsonish(reflect.TypeOf(""), i)
+		}
 		result.WriteString(insertIndent(i) + "{\n")
 		for j := 0; j < t.NumField(); j++ {
 			f := t.Field(j)
@@ -151,14 +176,9 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 		}
 		result.WriteString(insertIndent(i) + "}\n")
 	case reflect.Slice:
-		sType := t.Elem().Kind().String()
-		if sType == "ptr" {
-			result.WriteString("null\n")
-		} else {
-			result.WriteString("[\n")
-			result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
-			result.WriteString(insertIndent(i) + "]\n")
-		}
+		result.WriteString("[\n")
+		result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
+		result.WriteString(insertIndent(i) + "]\n")
 	default:
 		result.WriteString(insertIndent(i) + "\"<" + t.Kind().String() + ">\"\n")
 
