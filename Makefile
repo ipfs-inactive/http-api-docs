@@ -8,6 +8,6 @@ deps: gx
 test: deps
 	go test ./...
 install: deps
-	go install ./ipfs-http-api-docs-md
+	go install ./http-api-docs
 publish:
 	gx-go rewrite --undo

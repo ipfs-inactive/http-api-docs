@@ -1,4 +1,4 @@
-# ipfs-http-api-docs
+# http-api-docs
 
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
@@ -7,7 +7,6 @@
 [![Build Status](https://travis-ci.org/ipfs/ipfs-http-api-docs.svg?branch=master)](https://travis-ci.org/ipfs/ipfs-http-api-docs)
 
 > A generator for go-ipfs API endpoints documentation.
-
 
 ## Table of Contents
 
@@ -30,7 +29,7 @@ In order to build this project, you need to download `go-ipfs` and install its g
 Then you can:
 
 ```
-> go install github.com/ipfs/ipfs-http-api-docs/ipfs-http-api-docs-md
+> go install github.com/ipfs/http-api-docs/http-api-docs
 ```
 
 Or alternatively checkout this repository and run:
@@ -44,7 +43,7 @@ Or alternatively checkout this repository and run:
 After installing you can run:
 
 ```
-> ipfs-http-api-docs-md
+> http-api-docs
 ```
 
 This should spit out a Markdown document. This is exactly the api.md documentation at https://github.com/ipfs/website/blob/master/content/pages/docs/api.md , so you can redirect the output to just overwrite that file.

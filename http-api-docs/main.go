@@ -3,8 +3,7 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/ipfs/ipfs-http-api-docs"
+	"github.com/ipfs/http-api-docs"
 )
 
 func main() {

@@ -1,15 +1,15 @@
 {
   "author": "hector",
   "bugs": {
-    "url": "https://github.com/ipfs/ipfs-http-api-docs"
+    "url": "https://github.com/ipfs/http-api-docs"
   },
   "gx": {
-    "dvcsimport": "github.com/ipfs/ipfs-http-api-docs"
+    "dvcsimport": "github.com/ipfs/http-api-docs"
   },
   "gxVersion": "0.10.0",
   "language": "go",
   "license": "",
-  "name": "ipfs-http-api-docs",
+  "name": "http-api-docs",
   "releaseCmd": "git commit -a -m \"gx publish $VERSION\"",
   "version": "0.0.1"
 }
