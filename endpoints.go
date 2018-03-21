@@ -10,9 +10,10 @@ import (
 	"sort"
 	"strings"
 
-	cmds "github.com/ipfs/go-ipfs/commands"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
 	config "github.com/ipfs/go-ipfs/repo/config"
+	cmdkit "gx/ipfs/QmceUdzxkimdYsgtX733uNgzf1DLHyBKN6ehGSp85ayppM/go-ipfs-cmdkit"
+	cmds "gx/ipfs/QmfAkMSt9Fwzk48QDJecPcwCUjnf2uG7MLnmCGTp4C6ouL/go-ipfs-cmds"
 )
 
 // A map of single endpoints to be skipped (subcommands are processed though).
@@ -72,7 +73,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 	if !ignore { // Extract arguments, options...
 		for _, arg := range cmd.Arguments {
 			argType := "string"
-			if arg.Type == cmds.ArgFile {
+			if arg.Type == cmdkit.ArgFile {
 				argType = "file"
 			}
 			arguments = append(arguments, &Argument{
@@ -84,7 +85,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 		}
 
 		for _, opt := range cmd.Options {
-			def := fmt.Sprint(opt.DefaultVal())
+			def := fmt.Sprint(opt.Default())
 			if def == "<nil>" {
 				def = ""
 			}
