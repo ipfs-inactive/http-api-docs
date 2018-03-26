@@ -1,12 +1,22 @@
+os:
+  - linux
+
+sudo: false
+
 language: go
+
 go:
-  - '1.7'
+  - 1.9.x
 
 install:
-  - go get github.com/ipfs/go-ipfs
-  - cd $GOPATH/src/github.com/ipfs/go-ipfs
   - make deps
-  - cd -
 
 script:
-  - make test
+  - bash <(curl -s https://raw.githubusercontent.com/ipfs/ci-helpers/master/travis-ci/run-standard-tests.sh)
+
+cache:
+    directories:
+        - $GOPATH/src/gx
+
+notifications:
+  email: false
