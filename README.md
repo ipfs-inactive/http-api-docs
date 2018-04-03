@@ -18,23 +18,11 @@
 
 ## Install
 
-In order to build this project, you need to download `go-ipfs` and install its gx dependencies:
+In order to build this project, you need to first clone the repo and then run `make install`:
 
-```
-> go get github.com/ipfs/go-ipfs
-> cd $GOPATH/src/github.com/ipfs/go-ipfs
-> make deps
-```
-
-Then you can:
-
-```
-> go install github.com/ipfs/http-api-docs/http-api-docs
-```
-
-Or alternatively checkout this repository and run:
-
-```
+```sh
+> git clone https://github.com/ipfs/http-api-docs/http-api-docs
+> cd http-api-docs
 > make install
 ```
 
