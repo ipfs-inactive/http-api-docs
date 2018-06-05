@@ -114,7 +114,7 @@ func (md *MarkdownFormatter) GenerateIndex(endps []*Endpoint) string {
 	for _, endp := range endps {
 		fmt.Fprintf(buf, "  *  [%s](#%s)\n",
 			strings.TrimPrefix(endp.Name, "/api/v0"),
-			strings.Replace(endp.Name, "/", "", -1))
+			strings.Replace(strings.TrimPrefix(endp.Name, "/"), "/", "-", -1))
 	}
 
 	buf.WriteString("\n\n## Endpoints\n\n")
