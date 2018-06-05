@@ -13,14 +13,14 @@
       "version": "1.0.0"
     },
     {
-      "hash": "QmabLouZTZwhfALuBcssPvkzhbYGMb4394huT7HY4LQ6d3",
+      "hash": "QmTjNRVt2fvaRFu93keEC7z5M1GS1iH6qZ9227htQioTUY",
       "name": "go-ipfs-cmds",
-      "version": "1.0.8"
+      "version": "1.0.13"
     },
     {
-      "hash": "QmXporsyf5xMvffd2eiTDoq85dNpYUynGJhfabzDjwP8uR",
+      "hash": "QmcKwjeebv5SX3VFUGDFa4BNMYhy14RRaCzQP7JN3UQDpB",
       "name": "go-ipfs",
-      "version": "0.4.14-rc1"
+      "version": "0.4.15"
     }
   ],
   "gxVersion": "0.10.0",
