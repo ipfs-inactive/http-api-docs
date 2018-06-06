@@ -154,12 +154,22 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 	case reflect.Invalid:
 		result.WriteString("null\n")
 	case reflect.Interface:
-		result.WriteString(insertIndent(i) + "\"<object>\"\n")
-	case reflect.Ptr:
-		if _, ok := t.MethodByName("String"); ok && countExported(t.Elem()) == 0 {
-			return interfaceToJsonish(reflect.TypeOf(""), i)
+		description := "\"<object>\""
+		// Handle types that should be called out specially
+		if t.String() == "multiaddr.Multiaddr" {
+			description = "\"<multiaddr-string>\""
 		}
-		return interfaceToJsonish(t.Elem(), i)
+		result.WriteString(fmt.Sprintf("%s%s\n", insertIndent(i), description))
+	case reflect.Ptr:
+		// CIDs have specialized JSON marshaling, see:
+		// https://github.com/ipfs/go-cid/blob/078355866b1dda1658b5fdc5496ed7e25fdcf883/cid.go#L407-L415
+		if t.String() == "*cid.Cid" {
+			result.WriteString(insertIndent(i) + "{ \"/\": \"<cid-string>\" }\n")
+		} else if _, ok := t.MethodByName("String"); ok && countExported(t.Elem()) == 0 {
+			return interfaceToJsonish(reflect.TypeOf(""), i)
+		} else {
+			return interfaceToJsonish(t.Elem(), i)
+		}
 	case reflect.Map:
 		result.WriteString(insertIndent(i) + "{\n")
 		result.WriteString(insertIndent(i+IndentLevel) + fmt.Sprintf(`"<%s>": `, t.Key().Kind()))
