@@ -21,7 +21,7 @@
 In order to build this project, you need to first clone the repo and then run `make install`:
 
 ```sh
-> git clone https://github.com/ipfs/http-api-docs/http-api-docs
+> git clone https://github.com/ipfs/http-api-docs
 > cd http-api-docs
 > make install
 ```
