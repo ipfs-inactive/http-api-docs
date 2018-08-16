@@ -18,11 +18,14 @@
 
 ## Install
 
-In order to build this project, you need to first install Go and then `go get` this repo, finally run `make install`:
+In order to build this project, you need to first install Go, clone this repo, and finally run `make install`:
 
 ```sh
-> go get github.com/ipfs/http-api-docs/http-api-docs
-> cd $GOPATH/src/github.com/ipfs/http-api-docs
+> GOPATH="$(go env GOPATH)"
+> mkdir -p "$GOPATH/src/github.com/ipfs/"
+> cd "$GOPATH/src/github.com/ipfs/"
+> git clone https://github.com/ipfs/http-api-docs
+> cd http-api-docs
 > make install
 ```
 
