@@ -21,7 +21,7 @@
 In order to build this project, you need to first clone the repo and then run `make install`:
 
 ```sh
-> git clone https://github.com/ipfs/http-api-docs/http-api-docs
+> git clone https://github.com/ipfs/http-api-docs
 > cd http-api-docs
 > make install
 ```
@@ -34,7 +34,7 @@ After installing you can run:
 > http-api-docs
 ```
 
-This should spit out a Markdown document. This is exactly the api.md documentation at https://github.com/ipfs/website/blob/master/content/pages/docs/api.md , so you can redirect the output to just overwrite that file.
+This should spit out a Markdown document. This is exactly the api.md documentation at https://github.com/ipfs/website/blob/master/content/docs/api.md , so you can redirect the output to just overwrite that file.
 
 ## Captain
 
