@@ -34,7 +34,7 @@ After installing you can run:
 > http-api-docs
 ```
 
-This should spit out a Markdown document. This is exactly the api.md documentation at https://github.com/ipfs/website/blob/master/content/pages/docs/api.md , so you can redirect the output to just overwrite that file.
+This should spit out a Markdown document. This is exactly the api.md documentation at https://github.com/ipfs/docs/blob/master/content/reference/api/http.md, so you can redirect the output to just overwrite that file.
 
 ## Captain
 
