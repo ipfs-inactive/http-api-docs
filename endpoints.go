@@ -154,7 +154,11 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 	case reflect.Invalid:
 		result.WriteString("null\n")
 	case reflect.Interface:
-		result.WriteString(insertIndent(i) + "\"<object>\"\n")
+		if t.Name() == "Multiaddr" {
+			result.WriteString(insertIndent(i) + `"<multiaddr-string>"` + "\n")
+		} else {
+			result.WriteString(insertIndent(i) + "\"<object>\"\n")
+		}
 	case reflect.Ptr:
 		if _, ok := t.MethodByName("String"); ok && countExported(t.Elem()) == 0 {
 			return interfaceToJsonish(reflect.TypeOf(""), i)
