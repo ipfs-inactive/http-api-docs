@@ -17,7 +17,8 @@ type Formatter interface {
 func GenerateDocs(api []*Endpoint, formatter Formatter) string {
 	buf := new(bytes.Buffer)
 	buf.WriteString(formatter.GenerateIntro())
-	buf.WriteString(formatter.GenerateIndex(api))
+	// In docs.ipfs.io this is handled by the TOC.
+	// buf.WriteString(formatter.GenerateIndex(api))
 	for _, endp := range api {
 		buf.WriteString(formatter.GenerateEndpointBlock(endp))
 		buf.WriteString(formatter.GenerateArgumentsBlock(endp.Arguments, endp.Options))

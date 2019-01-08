@@ -8,19 +8,9 @@
   },
   "gxDependencies": [
     {
-      "hash": "QmceUdzxkimdYsgtX733uNgzf1DLHyBKN6ehGSp85ayppM",
-      "name": "go-ipfs-cmdkit",
-      "version": "1.0.0"
-    },
-    {
-      "hash": "QmTjNRVt2fvaRFu93keEC7z5M1GS1iH6qZ9227htQioTUY",
-      "name": "go-ipfs-cmds",
-      "version": "1.0.13"
-    },
-    {
-      "hash": "QmcKwjeebv5SX3VFUGDFa4BNMYhy14RRaCzQP7JN3UQDpB",
+      "hash": "QmUJYo4etAQqFfSS2rarFAE97eNGB8ej64YkRT2SmsYD4r",
       "name": "go-ipfs",
-      "version": "0.4.15"
+      "version": "0.4.18"
     }
   ],
   "gxVersion": "0.10.0",
