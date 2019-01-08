@@ -166,16 +166,20 @@ func interfaceToJsonish(t reflect.Type, i int) string {
 		result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
 		result.WriteString(insertIndent(i) + "}\n")
 	case reflect.Struct:
-		if _, ok := t.MethodByName("String"); ok && countExported(t) == 0 {
-			return interfaceToJsonish(reflect.TypeOf(""), i)
+		if t.Name() == "Cid" { // special handling for Cids
+			result.WriteString(insertIndent(i) + `{ "/": "<cid-string>" }` + "\n")
+		} else {
+			if _, ok := t.MethodByName("String"); ok && countExported(t) == 0 {
+				return interfaceToJsonish(reflect.TypeOf(""), i)
+			}
+			result.WriteString(insertIndent(i) + "{\n")
+			for j := 0; j < t.NumField(); j++ {
+				f := t.Field(j)
+				result.WriteString(fmt.Sprintf(insertIndent(i+IndentLevel)+"\"%s\": ", f.Name))
+				result.WriteString(interfaceToJsonish(f.Type, i+IndentLevel))
+			}
+			result.WriteString(insertIndent(i) + "}\n")
 		}
-		result.WriteString(insertIndent(i) + "{\n")
-		for j := 0; j < t.NumField(); j++ {
-			f := t.Field(j)
-			result.WriteString(fmt.Sprintf(insertIndent(i+IndentLevel)+"\"%s\": ", f.Name))
-			result.WriteString(interfaceToJsonish(f.Type, i+IndentLevel))
-		}
-		result.WriteString(insertIndent(i) + "}\n")
 	case reflect.Slice:
 		result.WriteString("[\n")
 		result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
