@@ -15,13 +15,13 @@ type MarkdownFormatter struct{}
 
 func (md *MarkdownFormatter) GenerateIntro() string {
 	buf := new(bytes.Buffer)
-	fmt.Fprintf(buf, `----
+	fmt.Fprintf(buf, `---
 title: "HTTP API"
 weight: 20
 menu:
     reference:
         parent: api
-----
+---
 
 <!-- TODO: Describe how to change ports and configure the API server -->
 <!-- TODO: Structure this around command groups (dag, object, files, etc.) -->
