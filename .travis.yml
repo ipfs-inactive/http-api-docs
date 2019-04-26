@@ -5,6 +5,11 @@ sudo: false
 
 language: go
 
+env:
+  matrix:
+    - BUILD_DEPTYPE=gomod
+
+
 go:
   - 1.12.x
 
