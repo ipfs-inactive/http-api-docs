@@ -69,7 +69,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 	var arguments []*Argument
 	var options []*Argument
 
-	ignore := len(cmd.Subcommands) > 0 || IgnoreEndpoints[name]
+	ignore := cmd.Run == nil || IgnoreEndpoints[name]
 	if !ignore { // Extract arguments, options...
 		for _, arg := range cmd.Arguments {
 			argType := "string"

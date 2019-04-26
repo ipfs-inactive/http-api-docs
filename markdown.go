@@ -47,7 +47,7 @@ repository on GitHub.
 
 ### Alignment with CLI Commands
 
-[Every command](../cli/) usable from the CLI is also available through
+[Every command](../commands/) usable from the CLI is also available through
 the HTTP API. For example:
 `+"```sh"+
 		`
