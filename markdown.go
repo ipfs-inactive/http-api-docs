@@ -209,7 +209,7 @@ On success, the call to this endpoint will return with 200 and the following bod
 
 `)
 
-	buf.WriteString("```text\n" + response + "\n```\n\n")
+	buf.WriteString("```json\n" + response + "\n```\n\n")
 
 	return buf.String()
 }

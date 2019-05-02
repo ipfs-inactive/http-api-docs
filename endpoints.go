@@ -3,18 +3,23 @@
 package docs
 
 import (
-	"bytes"
 	"fmt"
-	"reflect"
-	"regexp"
 	"sort"
-	"strings"
 
+	jsondoc "github.com/Stebalien/go-json-doc"
+	cid "github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs"
 	cmdkit "github.com/ipfs/go-ipfs-cmdkit"
 	cmds "github.com/ipfs/go-ipfs-cmds"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
+	peer "github.com/libp2p/go-libp2p-peer"
+	multiaddr "github.com/multiformats/go-multiaddr"
 )
+
+var JsondocGlossary = jsondoc.NewGlossary().
+	WithSchema(new(cid.Cid), jsondoc.Object{"/": "<cid-string>"}).
+	WithName(new(multiaddr.Multiaddr), "multiaddr-string").
+	WithName(new(peer.ID), "peer-id")
 
 // A map of single endpoints to be skipped (subcommands are processed though).
 var IgnoreEndpoints = map[string]bool{}
@@ -118,93 +123,14 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 	return endpoints
 }
 
-// TODO: This maybe should be a separate Go module for reusability
-func interfaceToJsonish(t reflect.Type, i int) string {
-	// Aux function
-	insertIndent := func(i int) string {
-		buf := new(bytes.Buffer)
-		for j := 0; j < i; j++ {
-			buf.WriteRune(' ')
-		}
-		return buf.String()
-	}
-
-	countExported := func(t reflect.Type) int {
-		if t.Kind() != reflect.Struct {
-			return 0
-		}
-
-		count := 0
-
-		for i := 0; i < t.NumField(); i++ {
-			f := t.Field(i)
-			if f.Name[0:1] == strings.ToUpper(f.Name[0:1]) {
-				count++
-			}
-		}
-		return count
-	}
-
-	result := new(bytes.Buffer)
-	if i > MaxIndent { // 5 levels is enough. Infinite loop failsafe
-		return insertIndent(i) + "...\n"
-	}
-
-	switch t.Kind() {
-	case reflect.Invalid:
-		result.WriteString("null\n")
-	case reflect.Interface:
-		if t.Name() == "Multiaddr" {
-			result.WriteString(insertIndent(i) + `"<multiaddr-string>"` + "\n")
-		} else {
-			result.WriteString(insertIndent(i) + "\"<object>\"\n")
-		}
-	case reflect.Ptr:
-		if _, ok := t.MethodByName("String"); ok && countExported(t.Elem()) == 0 {
-			return interfaceToJsonish(reflect.TypeOf(""), i)
-		}
-		return interfaceToJsonish(t.Elem(), i)
-	case reflect.Map:
-		result.WriteString(insertIndent(i) + "{\n")
-		result.WriteString(insertIndent(i+IndentLevel) + fmt.Sprintf(`"<%s>": `, t.Key().Kind()))
-		result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
-		result.WriteString(insertIndent(i) + "}\n")
-	case reflect.Struct:
-		if t.Name() == "Cid" { // special handling for Cids
-			result.WriteString(insertIndent(i) + `{ "/": "<cid-string>" }` + "\n")
-		} else {
-			if _, ok := t.MethodByName("String"); ok && countExported(t) == 0 {
-				return interfaceToJsonish(reflect.TypeOf(""), i)
-			}
-			result.WriteString(insertIndent(i) + "{\n")
-			for j := 0; j < t.NumField(); j++ {
-				f := t.Field(j)
-				result.WriteString(fmt.Sprintf(insertIndent(i+IndentLevel)+"\"%s\": ", f.Name))
-				result.WriteString(interfaceToJsonish(f.Type, i+IndentLevel))
-			}
-			result.WriteString(insertIndent(i) + "}\n")
-		}
-	case reflect.Slice:
-		result.WriteString("[\n")
-		result.WriteString(interfaceToJsonish(t.Elem(), i+IndentLevel))
-		result.WriteString(insertIndent(i) + "]\n")
-	default:
-		result.WriteString(insertIndent(i) + "\"<" + t.Kind().String() + ">\"\n")
-
-	}
-
-	// This removes wrong indents in cases like "key:      <string>"
-	fix, _ := regexp.Compile(":[ ]+")
-	finalResult := string(fix.ReplaceAll(result.Bytes(), []byte(": ")))
-
-	return string(finalResult)
-}
-
 func buildResponse(res interface{}) string {
 	// Commands with a nil type return text. This is a bad thing.
 	if res == nil {
 		return "This endpoint returns a `text/plain` response body."
 	}
-
-	return interfaceToJsonish(reflect.TypeOf(res), 0)
+	desc, err := JsondocGlossary.Describe(res)
+	if err != nil {
+		panic(err)
+	}
+	return desc
 }
