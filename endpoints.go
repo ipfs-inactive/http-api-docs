@@ -9,17 +9,19 @@ import (
 	jsondoc "github.com/Stebalien/go-json-doc"
 	cid "github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs"
-	cmdkit "github.com/ipfs/go-ipfs-cmdkit"
 	cmds "github.com/ipfs/go-ipfs-cmds"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
 	peer "github.com/libp2p/go-libp2p-peer"
+	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	multiaddr "github.com/multiformats/go-multiaddr"
 )
 
 var JsondocGlossary = jsondoc.NewGlossary().
 	WithSchema(new(cid.Cid), jsondoc.Object{"/": "<cid-string>"}).
 	WithName(new(multiaddr.Multiaddr), "multiaddr-string").
-	WithName(new(peer.ID), "peer-id")
+	WithName(new(peer.ID), "peer-id").
+	WithSchema(new(peerstore.PeerInfo),
+		jsondoc.Object{"ID": "peer-id", "Addrs": []string{"<multiaddr-string>"}})
 
 // A map of single endpoints to be skipped (subcommands are processed though).
 var IgnoreEndpoints = map[string]bool{}
@@ -78,7 +80,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 	if !ignore { // Extract arguments, options...
 		for _, arg := range cmd.Arguments {
 			argType := "string"
-			if arg.Type == cmdkit.ArgFile {
+			if arg.Type == cmds.ArgFile {
 				argType = "file"
 			}
 			arguments = append(arguments, &Argument{
