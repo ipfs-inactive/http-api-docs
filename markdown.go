@@ -111,7 +111,8 @@ flag is the %s query parameter below:
 
 ::: tip
 Some arguments may belong only to the CLI but appear here too. These usually
-belong to client-side processing of input, particularly in the `+"`add`"+` command.
+belong to client-side processing of input, particularly in the `+"`add`"+`
+command.
 :::
 
 
@@ -119,15 +120,18 @@ belong to client-side processing of input, particularly in the `+"`add`"+` comma
 
 Status codes used at the RPC layer are simple:
 
+- `+"`200`"+` - The request was processed or is being processed (streaming)
 - `+"`500`"+` - RPC endpoint returned an error
 - `+"`400`"+` - Malformed RPC, argument type error, etc
 - `+"`403`"+` - RPC call forbidden
 - `+"`404`"+` - RPC endpoint doesn't exist
 - `+"`405`"+` - HTTP Method Not Allowed
 
-In other words, `+"`500`"+` means that the function _does_ exist, it just
-failed internally for some reason. To know that reason, you have to look at
-the "application layer" error (usually returned with the body of the command).
+Status code `+"`500`"+` means that the function _does_ exist, it just failed
+internally for some reason. To know that reason, you have to look at the
+"application layer" error (usually returned with the body of the command). In
+the case of streaming endpoints, they always return 200 before starting to
+stream the response. Any errors are included as Trailer response headers.
 
 A `+"`405`"+`error may mean that you are using the wrong HTTP method
 (i.e. GET instead of POST), or that you are not allowed to call that method
@@ -243,7 +247,7 @@ Argument `+"`%s`"+` is of file type. This endpoint expects one or several files
 		if bodyArg.Endpoint == "/api/v0/add" {
 			fmt.Fprintln(buf, html.EscapeString(`
 
-The `+"`add`"+` command not only allow adding files, but also uploading
+The `+"`add`"+` command not only allows adding files, but also uploading
 directories and complex hierarchies.
 
 This happens as follows: Every part in the multipart request is a *directory*
@@ -269,8 +273,9 @@ Content-Type: application/octet-stream
 
 The above file includes its path in the "folderName/file.txt" hierarchy and
 IPFS will therefore be able to add it inside "folderName". The parts declaring
-the directories must be sent before the parts of their contents (ipfs
-does it with a depth-first traversal of the directory tree).
+the directories are optional when they have files inside and will be inferred
+from the filenames. In any case, a depth-first traversal of the directory tree
+is recommended to order the different parts making the request.
 
 The `+"`Abspath`"+` header is included for filestore/urlstore features that
 are enabled with the `+"`nocopy`"+` option and it can be set to the location

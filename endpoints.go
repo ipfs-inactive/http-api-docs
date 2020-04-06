@@ -24,9 +24,7 @@ var JsondocGlossary = jsondoc.NewGlossary().
 		jsondoc.Object{"ID": "peer-id", "Addrs": []string{"<multiaddr-string>"}})
 
 var clientOpts = map[string]struct{}{
-	cmds.EncLong:     struct{}{},
 	cmds.RecLong:     struct{}{},
-	cmds.TimeoutOpt:  struct{}{},
 	cmds.DerefLong:   struct{}{},
 	cmds.StdinName:   struct{}{},
 	cmds.Hidden:      struct{}{},
