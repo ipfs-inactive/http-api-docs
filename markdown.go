@@ -127,11 +127,16 @@ Status codes used at the RPC layer are simple:
 - `+"`404`"+` - RPC endpoint doesn't exist
 - `+"`405`"+` - HTTP Method Not Allowed
 
-Status code `+"`500`"+` means that the function _does_ exist, it just failed
-internally for some reason. To know that reason, you have to look at the
-"application layer" error (usually returned with the body of the command). In
-the case of streaming endpoints, they always return 200 before starting to
-stream the response. Any errors are included as Trailer response headers.
+Status code `+"`500`"+` means that the function _does_ exist, but IPFS was not
+able to fulfil the request because of an error. To know that reason, you have
+to look at the the error message that is usually returned with the body of the
+response (if no error, check the daemon logs).
+
+Streaming endpoints fail as above, unless they have started streaming. That
+means they will have sent a `+"`200`"+` status code already. If an error
+happens during the stream, it will be included in a Trailer response header
+(some endpoints may additionally include an error in the last streamed
+object).
 
 A `+"`405`"+`error may mean that you are using the wrong HTTP method
 (i.e. GET instead of POST), or that you are not allowed to call that method
