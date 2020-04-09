@@ -248,7 +248,7 @@ Abspath: /absolute/path/to/file.txt
 Content-Disposition: form-data; name="file"; filename="folderName%2Ffile.txt"
 Content-Type: application/octet-stream
 
-<contents...>
+...contents...
 `+"```"+`
 
 The above file includes its path in the "folderName/file.txt" hierarchy and IPFS will therefore be able to add it inside "folderName". The parts declaring the directories are optional when they have files inside and will be inferred from the filenames. In any case, a depth-first traversal of the directory tree is recommended to order the different parts making the request.
