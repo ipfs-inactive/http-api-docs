@@ -4,13 +4,12 @@ go 1.13
 
 require (
 	github.com/Stebalien/go-json-doc v0.0.2
-	github.com/ipfs/go-cid v0.0.2
-	github.com/ipfs/go-ipfs v0.4.22
+	github.com/ipfs/go-cid v0.0.4
+	github.com/ipfs/go-ipfs v0.4.23
 	github.com/ipfs/go-ipfs-cmds v0.2.2
 	github.com/libp2p/go-libp2p-peer v0.1.1
 	github.com/libp2p/go-libp2p-peerstore v0.0.6
 	github.com/multiformats/go-multiaddr v0.0.4
-	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898 // indirect
 )
 
 replace github.com/go-critic/go-critic v0.0.0-20181204210945-ee9bf5809ead => github.com/go-critic/go-critic v0.3.5-0.20190210220443-ee9bf5809ead

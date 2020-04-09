@@ -19,7 +19,7 @@ func (md *MarkdownFormatter) GenerateIntro() string {
 	fmt.Fprintf(buf, `---
 title: HTTP API
 legacyUrl: https://docs.ipfs.io/reference/api/http/
-description:  HTTP API reference for IPFS, the InterPlanetary File System.
+description: HTTP API reference for IPFS, the InterPlanetary File System.
 ---
 
 # HTTP API reference
