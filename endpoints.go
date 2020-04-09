@@ -23,6 +23,15 @@ var JsondocGlossary = jsondoc.NewGlossary().
 	WithSchema(new(peerstore.PeerInfo),
 		jsondoc.Object{"ID": "peer-id", "Addrs": []string{"<multiaddr-string>"}})
 
+var clientOpts = map[string]struct{}{
+	cmds.RecLong:     struct{}{},
+	cmds.DerefLong:   struct{}{},
+	cmds.StdinName:   struct{}{},
+	cmds.Hidden:      struct{}{},
+	cmds.Ignore:      struct{}{},
+	cmds.IgnoreRules: struct{}{},
+}
+
 // A map of single endpoints to be skipped (subcommands are processed though).
 var IgnoreEndpoints = map[string]bool{}
 
@@ -44,6 +53,7 @@ type Endpoint struct {
 
 // Argument defines an IPFS RPC API endpoint argument.
 type Argument struct {
+	Endpoint    string
 	Name        string
 	Description string
 	Type        string
@@ -84,6 +94,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 				argType = "file"
 			}
 			arguments = append(arguments, &Argument{
+				Endpoint:    name,
 				Name:        arg.Name,
 				Type:        argType,
 				Required:    arg.Required,
@@ -92,6 +103,11 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 		}
 
 		for _, opt := range cmd.Options {
+			// skip client-side options
+			if _, ok := clientOpts[opt.Names()[0]]; ok {
+				continue
+			}
+
 			def := fmt.Sprint(opt.Default())
 			if def == "<nil>" {
 				def = ""
