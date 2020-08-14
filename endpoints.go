@@ -103,9 +103,13 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 		}
 
 		for _, opt := range cmd.Options {
-			// skip client-side options
 			if _, ok := clientOpts[opt.Names()[0]]; ok {
-				continue
+				if opt.Names()[0] == cmds.RecLong && name == "/api/v0/refs" {
+					// special case: do include the `recursive` option for the refs endpoint
+				} else {
+					// otherwise its a client-side option; skip it.
+					continue
+				}
 			}
 
 			def := fmt.Sprint(opt.Default())
