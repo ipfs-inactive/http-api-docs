@@ -23,13 +23,15 @@ var JsondocGlossary = jsondoc.NewGlossary().
 	WithSchema(new(peerstore.PeerInfo),
 		jsondoc.Object{"ID": "peer-id", "Addrs": []string{"<multiaddr-string>"}})
 
-var clientOpts = map[string]struct{}{
-	cmds.RecLong:     struct{}{},
-	cmds.DerefLong:   struct{}{},
-	cmds.StdinName:   struct{}{},
-	cmds.Hidden:      struct{}{},
-	cmds.Ignore:      struct{}{},
-	cmds.IgnoreRules: struct{}{},
+var ignoreOptsPerEndpoint = map[string]map[string]struct{}{
+	"/api/v0/add": {
+		cmds.RecLong:     struct{}{},
+		cmds.DerefLong:   struct{}{},
+		cmds.StdinName:   struct{}{},
+		cmds.Hidden:      struct{}{},
+		cmds.Ignore:      struct{}{},
+		cmds.IgnoreRules: struct{}{},
+	},
 }
 
 // A map of single endpoints to be skipped (subcommands are processed though).
@@ -103,11 +105,9 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 		}
 
 		for _, opt := range cmd.Options {
-			if _, ok := clientOpts[opt.Names()[0]]; ok {
-				if opt.Names()[0] == cmds.RecLong && name == "/api/v0/refs" {
-					// special case: do include the `recursive` option for the refs endpoint
-				} else {
-					// otherwise its a client-side option; skip it.
+			if ignoreOpts, ok := ignoreOptsPerEndpoint[name]; ok {
+				if _, ok := ignoreOpts[opt.Names()[0]]; ok {
+					// skip this option for this endpoint.
 					continue
 				}
 			}
