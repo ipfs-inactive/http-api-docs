@@ -67,11 +67,11 @@ jobs:
         with:
           name: http-api-docs-current.md
 
-      - name: Diff the outputs (test)
-        run: git diff --no-index http-api-docs-current.md http-api-docs-proposed.md
-
+        # gir diff exists with an error if there is a diff... so we ignore that here. 
       - name: Diff the outputs
-        run: git diff --no-index http-api-docs-current.md http-api-docs-proposed.md > diff.txt
+        run: git diff --no-index --output diff.txt http-api-docs-current.md http-api-docs-proposed.md || true
+
+      - run: cat diff.txt
 
       - uses: actions/upload-artifact@v2
         with:
