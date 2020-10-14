@@ -1,0 +1,97 @@
+name: Diff output
+
+on: pull_request
+
+jobs:
+  build-proposed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.14'
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v2
+      
+      - name: Build binary
+        run: CGO_ENABLED=0 GO111MODULE=on go install ./http-api-docs
+
+      - name: Run http-api-docs
+        run: http-api-docs > http-api-docs-proposed.md
+
+      - run: cat http-api-docs-proposed.md
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: http-api-docs-proposed.md
+          path: http-api-docs-proposed.md
+
+  build-current:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.14'
+
+      - name: Checkout default branch
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      
+      - name: Build binary
+        run: CGO_ENABLED=0 GO111MODULE=on go install ./http-api-docs
+
+      - name: Run http-api-docs
+        run: http-api-docs > http-api-docs-current.md
+
+      - run: cat http-api-docs-current.md
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: http-api-docs-current.md
+          path: http-api-docs-current.md
+
+  diff:
+    needs: [build-current, build-proposed]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download proposed output
+        uses: actions/download-artifact@v2
+        with:
+          name: http-api-docs-proposed.md
+
+      - name: Download current output
+        uses: actions/download-artifact@v2
+        with:
+          name: http-api-docs-current.md
+      
+      - name: Diff the outputs
+        run: git diff --no-index http-api-docs-current.md http-api-docs-proposed.md > diff.txt
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: http-api-docs-diff.txt
+          path: diff.txt
+
+      - name: Prepare diff for comment
+        id: diff
+        run: |
+          body=$(cat diff.txt)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}" 
+          echo ::set-output name=body::$body
+
+      - name: Add diff as PR comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          issue-number: ${{ github.event.number }}
+          body: |
+            Diff of http-api-docs output:
+            ```diff
+            ${{ steps.diff.outputs.body }}
+            ```
