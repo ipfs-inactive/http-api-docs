@@ -99,8 +99,17 @@ Flags are added through the query string. For example, the %s flag is the %s que
 }
 `+"```"+`
 
+Some flags may be repeated. For example, the --status flag may be reused as below:
+
+`+"```"+`
+> curl -X POST "http://127.0.0.1:5001/api/v0/pin/remote/service/ls?name=myservice&status=pinned&status=pinning"
+`+"```"+`
+
 ::: tip
 Some arguments may belong only to the CLI but appear here too. These usually belong to client-side processing of input, particularly in the `+"`add`"+` command.
+
+Additionally, as a convenince certain CLI commands may allow passing repeated flags as delimited lists such as
+`+"`ipfs pin remote service ls --status=pinned,pinning`"+`, however this does not apply to the HTTP API.
 :::
 
 
