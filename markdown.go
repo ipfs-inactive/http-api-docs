@@ -99,7 +99,7 @@ Flags are added through the query string. For example, the %s flag is the %s que
 }
 `+"```"+`
 
-Some flags may be repeated. For example, the --status flag may be reused as below:
+Some flags may be repeated. For example, the `+"`--status`"+` flag may be reused as below:
 
 `+"```"+`
 > curl -X POST "http://127.0.0.1:5001/api/v0/pin/remote/service/ls?name=myservice&status=pinned&status=pinning"
