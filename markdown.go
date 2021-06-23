@@ -171,14 +171,14 @@ func (md *MarkdownFormatter) GenerateArgumentsBlock(args []*Argument, opts []*Ar
 	fmt.Fprintf(buf, "### Arguments\n\n")
 
 	if len(args)+len(opts) == 0 {
-		fmt.Fprintf(buf, "This endpoint takes no arguments.\n")
+		fmt.Fprint(buf, "This endpoint takes no arguments.\n")
 	}
 
 	for _, arg := range args {
-		fmt.Fprintf(buf, genArgument(arg, true))
+		fmt.Fprint(buf, genArgument(arg, true))
 	}
 	for _, opt := range opts {
-		fmt.Fprintf(buf, genArgument(opt, false))
+		fmt.Fprint(buf, genArgument(opt, false))
 	}
 
 	fmt.Fprintf(buf, "\n")
@@ -186,7 +186,7 @@ func (md *MarkdownFormatter) GenerateArgumentsBlock(args []*Argument, opts []*Ar
 }
 
 // Removes the "Default:..." part in the descriptions.
-var fixDesc, _ = regexp.Compile(" Default: [a-zA-z0-9-_]+ ?\\.")
+var fixDesc, _ = regexp.Compile(` Default: [a-zA-z0-9-_]+ ?\.`)
 
 func genArgument(arg *Argument, aliasToArg bool) string {
 	// These get handled by GenerateBodyBlock
