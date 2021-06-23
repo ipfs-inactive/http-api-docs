@@ -11,8 +11,7 @@ import (
 	config "github.com/ipfs/go-ipfs"
 	cmds "github.com/ipfs/go-ipfs-cmds"
 	corecmds "github.com/ipfs/go-ipfs/core/commands"
-	peer "github.com/libp2p/go-libp2p-peer"
-	peerstore "github.com/libp2p/go-libp2p-peerstore"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 	multiaddr "github.com/multiformats/go-multiaddr"
 )
 
@@ -20,7 +19,7 @@ var JsondocGlossary = jsondoc.NewGlossary().
 	WithSchema(new(cid.Cid), jsondoc.Object{"/": "<cid-string>"}).
 	WithName(new(multiaddr.Multiaddr), "multiaddr-string").
 	WithName(new(peer.ID), "peer-id").
-	WithSchema(new(peerstore.PeerInfo),
+	WithSchema(new(peer.AddrInfo),
 		jsondoc.Object{"ID": "peer-id", "Addrs": []string{"<multiaddr-string>"}})
 
 var ignoreOptsPerEndpoint = map[string]map[string]struct{}{
@@ -127,7 +126,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 		res := buildResponse(cmd.Type)
 
 		endpoints = []*Endpoint{
-			&Endpoint{
+			{
 				Name:        name,
 				Description: cmd.Helptext.Tagline,
 				Arguments:   arguments,
