@@ -127,7 +127,7 @@ func Endpoints(name string, cmd *cmds.Command) (endpoints []*Endpoint) {
 		res := buildResponse(cmd.Type)
 
 		endpoints = []*Endpoint{
-			&Endpoint{
+			{
 				Name:        name,
 				Description: cmd.Helptext.Tagline,
 				Arguments:   arguments,
