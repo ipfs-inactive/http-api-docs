@@ -1,6 +1,6 @@
 module github.com/ipfs/http-api-docs
 
-go 1.15
+go 1.16
 
 require (
 	github.com/Stebalien/go-json-doc v0.0.2
