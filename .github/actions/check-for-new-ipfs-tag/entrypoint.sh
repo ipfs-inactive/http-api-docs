@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -eu
 
 # extract go-ipfs release tag used in http-api-docs from go.mod in this repo
