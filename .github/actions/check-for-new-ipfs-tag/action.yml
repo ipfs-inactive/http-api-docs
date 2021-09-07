@@ -1,0 +1,9 @@
+name: 'Check for a new go-ipfs tag'
+outputs:
+  new_tag_available:
+    description: "Whether a new go-ipfs tag is available since the tag in the go.mod file of this repo"
+  tag_name:
+    description: "go-ipfs tag name, if a new tag is available"
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

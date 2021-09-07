@@ -1,0 +1,24 @@
+name: Update repo on new ipfs-tag release
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 5,17 * * *' # run every day at 5:30am and 5:30pm UTC
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout http-api-docs
+        uses: actions/checkout@v2
+        with:
+          path: ./http-api-docs
+      - name: Checkout go-ipfs
+        uses: actions/checkout@v2
+        with:
+          repository: ipfs/go-ipfs
+          path: ./go-ipfs
+      - name: List directories
+        run: |
+          ls -l 
+          ls -l ./http-api-docs
+          ls -l ./go-ipfs
