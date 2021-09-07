@@ -25,4 +25,4 @@ jobs:
           ls -l ./http-api-docs
           ls -l ./go-ipfs
       - name: Update http-api-docs, if necessary
-        uses: ./.github/actions/check-for-new-ipfs-tag
+        uses: ./http-api-docs/.github/actions/check-for-new-ipfs-tag
