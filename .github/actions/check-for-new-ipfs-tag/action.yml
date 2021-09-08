@@ -1,4 +1,0 @@
-name: 'Check for a new go-ipfs tag'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'

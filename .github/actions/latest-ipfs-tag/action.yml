@@ -1,6 +1,6 @@
 name: 'Find latest go-ipfs tag'
 outputs:
-  latest_tag:
+  latest-tag:
     description: "latest go-ipfs tag name"
 runs:
   using: 'docker'
