@@ -11,18 +11,5 @@ jobs:
     steps:
       - name: Checkout http-api-docs
         uses: actions/checkout@v2
-        with:
-          path: ./http-api-docs
-      - name: Checkout go-ipfs
-        uses: actions/checkout@v2
-        with:
-          repository: ipfs/go-ipfs
-          path: ./go-ipfs
-          fetch-depth: 0
-      # - name: List directories
-      #   run: |
-      #     ls -l 
-      #     ls -l ./http-api-docs
-      #     ls -l ./go-ipfs
-      - name: Update http-api-docs, if necessary
-        uses: ./http-api-docs/.github/actions/check-for-new-ipfs-tag
+      - name: Find latest go-ipfs tag
+        uses: ./http-api-docs/.github/actions/latest-ipfs-tag

@@ -12,7 +12,7 @@ echo "The latest IPFS tag is ${LATEST_IPFS_TAG}"
 cd ../
 
 # make the upgrade, if newer go-ipfs tags exist
-if [[ "$CURRENT_IPFS_TAG" == "$LATEST_IPFS_TAG" ]]; then
+if [ "$CURRENT_IPFS_TAG" = "$LATEST_IPFS_TAG" ]; then
     echo "http-api-docs already uses the latest go-ipfs tag."
 else
      cd http-api-docs
