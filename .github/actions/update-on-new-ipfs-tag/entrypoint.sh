@@ -6,7 +6,7 @@ CURRENT_IPFS_TAG=`grep 'github.com/ipfs/go-ipfs ' ./go.mod | awk '{print $2}'`
 echo "The currently used IPFS tag is ${CURRENT_IPFS_TAG}"
 
 # extract IPFS release
-LATEST_IPFS_TAG=$1
+LATEST_IPFS_TAG=$INPUT_LATEST_IPFS_TAG
 echo "The latest IPFS tag is ${LATEST_IPFS_TAG}"
 
 # make the upgrade, if newer go-ipfs tags exist

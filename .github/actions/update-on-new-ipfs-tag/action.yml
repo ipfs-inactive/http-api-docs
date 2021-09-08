@@ -6,5 +6,3 @@ inputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.latest-ipfs-tag }}
