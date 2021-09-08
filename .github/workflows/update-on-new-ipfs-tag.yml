@@ -17,4 +17,4 @@ jobs:
       - name: Update http-api-docs
         uses: ./.github/actions/update-on-new-ipfs-tag
         with:
-          latest-ipfs-tag: ${{ steps.latest-ipfs.latest-tag }}
+          latest_ipfs_tag: ${{ steps.latest-ipfs.latest-tag }}

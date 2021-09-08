@@ -1,6 +1,6 @@
 name: 'Update on new go-ipfs tag'
 inputs:
-  latest-ipfs-tag:
+  latest_ipfs_tag:
       description: "latest go ipfs tag"
       required: true
 runs:
