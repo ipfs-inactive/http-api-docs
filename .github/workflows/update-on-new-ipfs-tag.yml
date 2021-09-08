@@ -12,4 +12,4 @@ jobs:
       - name: Checkout http-api-docs
         uses: actions/checkout@v2
       - name: Find latest go-ipfs tag
-        uses: ./http-api-docs/.github/actions/latest-ipfs-tag
+        uses: ./.github/actions/latest-ipfs-tag
