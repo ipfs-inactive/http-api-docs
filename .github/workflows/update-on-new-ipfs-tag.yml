@@ -18,3 +18,5 @@ jobs:
         uses: ./.github/actions/update-on-new-ipfs-tag
         with:
           latest_ipfs_tag: ${{ steps.latest_ipfs.outputs.latest_tag }}
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
