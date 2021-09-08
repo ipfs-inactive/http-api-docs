@@ -20,3 +20,5 @@ jobs:
           latest_ipfs_tag: ${{ steps.latest_ipfs.outputs.latest_tag }}
       - name: pull-request
         uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
