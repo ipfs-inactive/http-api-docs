@@ -18,6 +18,8 @@ else
      mv go.mod2 go.mod
      go mod tidy
      make
+     git config --global user.email "doc-update-bot@protocol.ai"
+     git config --global user.name "PL docs update bot"
      git add -u
      git commit -m "Bumped go-ipfs dependence to tag $LATEST_IPFS_TAG."
 fi
