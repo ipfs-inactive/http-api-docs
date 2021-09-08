@@ -19,10 +19,10 @@ jobs:
           repository: ipfs/go-ipfs
           path: ./go-ipfs
           fetch-depth: 0
-      - name: List directories
-        run: |
-          ls -l 
-          ls -l ./http-api-docs
-          ls -l ./go-ipfs
+      # - name: List directories
+      #   run: |
+      #     ls -l 
+      #     ls -l ./http-api-docs
+      #     ls -l ./go-ipfs
       - name: Update http-api-docs, if necessary
         uses: ./http-api-docs/.github/actions/check-for-new-ipfs-tag
