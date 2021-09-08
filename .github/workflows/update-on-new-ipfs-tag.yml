@@ -12,9 +12,9 @@ jobs:
       - name: Checkout http-api-docs
         uses: actions/checkout@v2
       - name: Find latest go-ipfs tag
-        id: latest-ipfs
+        id: latest_ipfs
         uses: ./.github/actions/latest-ipfs-tag
       - name: Update http-api-docs
         uses: ./.github/actions/update-on-new-ipfs-tag
         with:
-          latest_ipfs_tag: ${{ steps.latest-ipfs.latest-tag }}
+          latest_ipfs_tag: ${{ steps.latest_ipfs.latest_tag }}
