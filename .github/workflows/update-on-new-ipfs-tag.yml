@@ -15,10 +15,12 @@ jobs:
         id: latest_ipfs
         uses: ./.github/actions/latest-ipfs-tag
       - name: Update http-api-docs
+        id: update
         uses: ./.github/actions/update-on-new-ipfs-tag
         with:
           latest_ipfs_tag: ${{ steps.latest_ipfs.outputs.latest_tag }}
-      - name: pull-request
+      - name: pull-request  # don't create a pr if there was no new ipfs tag
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: ${{ steps.update.outputs.updated_branch }}
